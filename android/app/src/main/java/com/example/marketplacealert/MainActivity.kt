@@ -5,6 +5,8 @@ import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.EditText
 import android.widget.SeekBar
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
@@ -16,6 +18,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var keywordInput: EditText
     private lateinit var locationInput: AutoCompleteTextView
     private lateinit var radiusSeek: SeekBar
+    private lateinit var radiusLabel: TextView
     private lateinit var startStopButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +28,20 @@ class MainActivity : AppCompatActivity() {
         keywordInput = findViewById(R.id.keywordInput)
         locationInput = findViewById(R.id.locationInput)
         radiusSeek = findViewById(R.id.radiusSeek)
+        radiusLabel = findViewById(R.id.radiusLabel)
         startStopButton = findViewById(R.id.startStopButton)
+
+        // Set initial value
+        radiusLabel.text = "Radius: ${radiusSeek.progress} km"
+
+        radiusSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                radiusLabel.text = "Radius: $progress km"
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
 
         startStopButton.setOnClickListener {
             val keyword = keywordInput.text.toString().trim()
@@ -33,6 +49,7 @@ class MainActivity : AppCompatActivity() {
             val radiusKm = radiusSeek.progress
 
             scheduleBackgroundSearch(keyword, location, radiusKm)
+            Toast.makeText(this, "Search scheduled!", Toast.LENGTH_SHORT).show()
         }
     }
 
