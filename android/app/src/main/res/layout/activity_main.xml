@@ -8,18 +8,28 @@
         android:id="@+id/keywordInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:inputType="text"
         android:hint="Product keyword" />
 
     <AutoCompleteTextView
         android:id="@+id/locationInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:inputType="textPostalAddress"
         android:hint="Location (city/zip)" />
+
+    <TextView
+        android:id="@+id/radiusLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Radius: 0 km"
+        android:paddingTop="8dp" />
 
     <SeekBar
         android:id="@+id/radiusSeek"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:contentDescription="Select search radius"
         android:max="100" />
 
     <Button
