@@ -11,6 +11,31 @@ USER_AGENTS = [
 ]
 
 
+def extract_listings(page) -> List[Dict[str, str]]:
+    """Extract listings from the page using DOM evaluation."""
+    return page.evaluate("""
+        () => {
+            const listings = [];
+            const items = document.querySelectorAll("div[role='article']");
+            for (const item of items) {
+                const titleEl = item.querySelector("span");
+                const priceEl = item.querySelector("span[dir='auto']");
+                const linkEl = item.querySelector("a");
+
+                if (!titleEl || !priceEl || !linkEl) continue;
+
+                listings.push({
+                    "id": linkEl.getAttribute("href") || "",
+                    "title": titleEl.innerText,
+                    "price": priceEl.innerText,
+                    "link": linkEl.getAttribute("href") || ""
+                });
+            }
+            return listings;
+        }
+    """)
+
+
 def search_marketplace(keyword: str, location: str, radius_km: int) -> List[Dict[str, str]]:
     """Scrape Facebook Marketplace for listings.
 
@@ -32,23 +57,7 @@ def search_marketplace(keyword: str, location: str, radius_km: int) -> List[Dict
         page.goto(url, wait_until="domcontentloaded")
         time.sleep(delay)
 
-        listings: List[Dict[str, str]] = []
-        for item in page.query_selector_all("div[role='article']"):
-            title_el = item.query_selector("span")
-            price_el = item.query_selector("span[dir='auto']")
-            link_el = item.query_selector("a")
-
-            if not (title_el and price_el and link_el):
-                continue
-
-            listings.append(
-                {
-                    "id": link_el.get_attribute("href") or "",
-                    "title": title_el.inner_text(),
-                    "price": price_el.inner_text(),
-                    "link": link_el.get_attribute("href") or "",
-                }
-            )
+        listings = extract_listings(page)
 
         browser.close()
         return listings
